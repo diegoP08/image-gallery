@@ -1,0 +1,66 @@
+{
+  "nombreExtension": {
+    "message": "Image gallery",
+    "description": ""
+  },
+
+  "descripcionExtension":{
+    "message": "Extension to save links of images and gifs",
+    "description": ""
+  },
+
+  "menuDeContexto":{
+    "message": "Save image in the gallery",
+    "description": ""
+  },
+
+  "copiadoCorrectoTitulo": {
+    "message": "The link was copied correctly",
+    "description": "Title of the notification."
+  },
+
+  "copiadoCorrectoContenido": {
+    "message": "The link was saved in the clipboard",
+    "description": "Tells the user that the link was saved correctly on the clipboard"
+  },
+
+  "guardadoCorrectoTitulo": {
+    "message": "The link was saved correctly",
+    "description": "Title of the notification."
+  },
+
+  "guardadoCorrectoContenido": {
+    "message": "The link was saved in the gallery",
+    "description": "Tells the user that the link was saved correctly on the gallery"
+  },
+
+  "eliminacionCorrectaTitulo": {
+    "message": "The link was removed correctly",
+    "description": "Title of the notification."
+  },
+
+  "eliminacionCorrectaContenido": {
+    "message": "The link was removed from the gallery",
+    "description": "Tells the user that the link was removed correctly on the gallery"
+  },
+
+  "botonCopiar": {
+    "message": "Copy",
+    "description": ""
+  },
+
+  "botonVer": {
+    "message": "See",
+    "description": ""
+  },
+
+  "botonEliminar":{
+    "message": "Delete",
+    "description": ""
+  },
+
+  "sinElementos":{
+    "message": "There are no items to display",
+    "description": ""
+  }
+}

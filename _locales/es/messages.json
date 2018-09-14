@@ -1,0 +1,66 @@
+{
+  "nombreExtension": {
+    "message": "Galeria de imagenes",
+    "description": ""
+  },
+
+  "descripcionExtension":{
+    "message": "Extension para guardar links de imagenes y gifs",
+    "description": ""
+  },
+
+  "menuDeContexto":{
+    "message": "Guardar imagen en la galeria",
+    "description": ""
+  },
+
+  "copiadoCorrectoTitulo": {
+    "message": "El link se copio correctamente",
+    "description": "Titulo de la notificacion."
+  },
+
+  "copiadoCorrectoContenido": {
+    "message": "El link fue guardado en el portapapeles",
+    "description": "Informa al usuario que el link se guardo correctamente en el portapapeles"
+  },
+
+  "guardadoCorrectoTitulo": {
+    "message": "El link se guardo correctamente",
+    "description": "Titulo de la notificacion."
+  },
+
+  "guardadoCorrectoContenido": {
+    "message": "El link se guardo correctamente en la galeria",
+    "description": "Informa al usuario que el link se guardo correctamente en la galeria"
+  },
+
+  "eliminacionCorrectaTitulo": {
+    "message": "El link fue eliminado correctamente",
+    "description": "Titulo de la notificacion."
+  },
+
+  "eliminacionCorrectaContenido": {
+    "message": "El link fue eliminado de la galeria",
+    "description": "Informa al usuario que el link se elimino correctamente de la galeria"
+  },
+
+  "botonCopiar": {
+    "message": "Copiar",
+    "description": ""
+  },
+
+  "botonVer": {
+    "message": "Ver",
+    "description": ""
+  },
+
+  "botonEliminar":{
+    "message": "Eliminar",
+    "description": ""
+  },
+
+  "sinElementos":{
+    "message": "No hay elementos para mostrar",
+    "description": ""
+  }
+}
