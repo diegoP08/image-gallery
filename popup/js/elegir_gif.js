@@ -1,7 +1,10 @@
+//Variables globales y constantes
+const elementosPorPagina = 20;
+
+
 //Copia link al portapapeles
 function copiarAlPortapapeles(){
-  var link = this.parentElement.parentElement.style.backgroundImage;
-  link = link.slice(4, -1).replace(/"/g, "");
+  var link = this.link;
   // Crea un campo de texto "oculto"
   var aux = document.createElement("input");
   // Asigna el contenido del elemento especificado al valor del campo
@@ -18,19 +21,29 @@ function copiarAlPortapapeles(){
   mostrarMensajeGuardado(link);
 }
 
+//Abre la imagen en nueva pestaña
 function verImagen(){
-  var link = this.parentElement.parentElement.style.backgroundImage;
-  link = link.slice(4, -1).replace(/"/g, "");
-  browser.tabs.create({ url: link });
+  browser.tabs.create({ url: this.link });
 }
 
+//Elimina la imagen de la coleccion
 function eliminarImagen(){
-  var cuadro = this.parentElement.parentElement;
-  var link = cuadro.style.backgroundImage;
-  link = link.slice(4, -1).replace(/"/g, "");
-  browser.storage.local.remove(link);
-  document.getElementsByClassName("page-item active")[0].firstChild.onclick();
-  mostrarMensajeEliminacion();
+  var link = this.link;
+
+  browser.storage.local.get("imagenes").then((imagenes) => {
+    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+
+    var imagenes = $.grep(imagenes, function(imagen){ 
+      return imagen.link != link; 
+    });
+
+    browser.storage.local.set({ ["imagenes"] : imagenes }).then((result) =>{
+      $(".page-item.active")[0].firstChild.onclick();
+      mostrarMensajeEliminacion();
+    });
+
+  })
+
 }
 
 //Muestra que se guardo el link en el portapapeles correctamente
@@ -66,114 +79,162 @@ function onError(e){
   console.error(e);
 }
 
+//Añade botones a la imagen
 function anadirBotones(cuadro){
-  var div = document.createElement("div");
-  div.align = "center";
-  div.style.display = "none";
-  div.id = "botones";
-  var botonCopiar = document.createElement("button");
-  botonCopiar.innerHTML = browser.i18n.getMessage("botonCopiar");
-  botonCopiar.onclick = copiarAlPortapapeles;
-  botonCopiar.className = "btn btn-success btn-sm";
-  var botonVer = document.createElement("button");
+  var link = cuadro.css("backgroundImage").slice(4, -1).replace(/"/g, "");
+  
+  var div = $(document.createElement('div'));
+  div.addClass("text-center d-none");
+  div.attr("id","botones");
+
+  var botonCopiar = $(document.createElement("button"));
+  botonCopiar.html(browser.i18n.getMessage("botonCopiar"));
+  botonCopiar.prop("link", link);
+  botonCopiar.bind("click", copiarAlPortapapeles);
+  botonCopiar.addClass("btn btn-success btn-sm");
+
+  /*var botonVer = document.createElement("button");
   botonVer.innerHTML = browser.i18n.getMessage("botonVer");
   botonVer.style.marginTop = "2px";
   botonVer.style.marginBottom = "2px";
   botonVer.onclick = verImagen;
-  botonVer.className = "btn btn-primary btn-sm";
-  var botonEliminar = document.createElement("button");
-  botonEliminar.innerHTML = browser.i18n.getMessage("botonEliminar");
-  botonEliminar.onclick = eliminarImagen;
-  botonEliminar.className = "btn btn-danger btn-sm";
-  div.appendChild(botonCopiar);
-  div.appendChild(botonVer);
-  div.appendChild(botonEliminar);
-  cuadro.appendChild(div);
+  botonVer.className = "btn btn-primary btn-sm";*/
+
+  var botonEliminar = $(document.createElement("button"));
+  botonEliminar.html(browser.i18n.getMessage("botonEliminar"));
+  botonEliminar.prop("link", link);
+  botonEliminar.css({"marginTop": "2px", "marginBottom": "2px"});
+  botonEliminar.bind("click", eliminarImagen);
+  botonEliminar.addClass("btn btn-danger btn-sm");
+
+  var botonMas = $(document.createElement("button"));
+  botonMas.html(browser.i18n.getMessage("botonMas"));
+  botonMas.prop("link", link);
+  //botonMas.bind("click", copiarAlPortapapeles);
+  botonMas.addClass("btn btn-info btn-sm");
+
+  div.append(botonCopiar);
+  div.append(botonEliminar);
+  div.append(botonMas);
+  
+  cuadro.append(div);
 }
 
+//Muestra acciones sobre la imagen
 function mostrarBotones(){
-  this.querySelector("#botones").style.display = "block";
+  $(this).find("#botones").removeClass("d-none");
+  $(this).find("#botones").addClass("d-block");
 }
 
+//Oculta acciones sobre la imagen
 function ocultarBotones(){
-  this.querySelector("#botones").style.display = "none";
+  $(this).find("#botones").removeClass("d-block");
+  $(this).find("#botones").addClass("d-none");
 }
 
-function initialize() {
-  document.getElementById("anterior1").onclick = cambiarPagina;
-  document.getElementById("anterior2").onclick = cambiarPagina;
-  document.getElementById("medio").onclick = cambiarPagina;
-  document.getElementById("siguiente1").onclick = cambiarPagina;
-  document.getElementById("siguiente2").onclick = cambiarPagina;
-  document.getElementById("anterior").onclick = paginaAnterior;
-  document.getElementById("siguiente").onclick = paginaSiguiente;
-
-  document.getElementById("anterior2").onclick();
-}
-
-initialize();
-
+//Actualiza el indice de paginas
 function actualizarIndice(pag){
-  var paginas = document.getElementsByClassName("page-link");
-  var medio = parseInt(document.getElementById("medio").innerHTML);
-  var actPag = parseInt(pag.innerHTML);
+  var paginas = $(".page-link");
+  
+  var medio = parseInt($("#medio").html());
+  var actPag = parseInt(pag.html());
   if (actPag > medio) {
     var dif = actPag - medio;
     for (var i = 1; i < paginas.length - 1; i++) {
-      paginas[i].innerHTML = parseInt(paginas[i].innerHTML) + dif;
+      const pagActual = $(paginas[i]);
+      pagActual.html(parseInt(pagActual.html()) + dif);
     }
   }else if(actPag < medio && actPag >= 3){
     var dif = medio - actPag;
     for (var i = 1; i < paginas.length - 1; i++) {
-      paginas[i].innerHTML = parseInt(paginas[i].innerHTML) - dif;
+      const pagActual = $(paginas[i]);
+      pagActual.html(parseInt(pagActual.html()) - dif);
     }
   }else if (actPag == 2 && medio != 3) {
     for (var i = 1; i < paginas.length - 1; i++) {
-      paginas[i].innerHTML = parseInt(paginas[i].innerHTML) - 1;
+      const pagActual = $(paginas[i]);
+      pagActual.html(parseInt(pagActual.html()) - 1);
     }
   }
-  for (var i = 1; i < paginas.length - 1; i++) {
-    if (paginas[i].parentElement.className == "page-item active") {
-      paginas[i].parentElement.className = "page-item";
+
+  browser.storage.local.get("imagenes").then((imagenes) => {
+    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+    var cantPags = Math.ceil(imagenes.length / elementosPorPagina);
+
+    for (var i = 1; i < paginas.length - 1; i++) {
+      const pagActual = $(paginas[i]);
+
+      if (pagActual.parent().attr("class") == "page-item active") {
+        pagActual.parent().attr("class", "page-item");
+      }
+
+      if (parseInt(pagActual.html()) == actPag) {
+        pagActual.parent().attr("class", "page-item active");
+  
+        if (actPag == 1) {
+          $("#anterior").parent().addClass("disabled");
+        }else{
+          $("#anterior").parent().removeClass("disabled");
+        }
+  
+        if (!cantPags || actPag == cantPags) {
+          $("#siguiente").parent().addClass("disabled");
+        }else{
+          $("#siguiente").parent().removeClass("disabled");
+        }
+      }
+
+      if (parseInt(pagActual.html()) <= cantPags) {
+        pagActual.parent().removeClass("disabled");
+      }else{
+        pagActual.parent().addClass("disabled");
+      }
     }
-    if (parseInt(paginas[i].innerHTML) == actPag) {
-      paginas[i].parentElement.className = "page-item active";
-    }
-  }
+
+  })
+  
+  
 }
 
+
+//Cambia de pagina
 function cambiarPagina(){
-  var pag = this.innerHTML;
-  var gettingAllStorageItems = browser.storage.local.get(null);
-  gettingAllStorageItems.then((results) => {
-    var links = Object.keys(results);
-    if(links.length == 0 || links.length <= ((pag - 1) * 25)){
-      document.getElementById("galeria").innerHTML = '<div align="center" style="margin: 20px">' + browser.i18n.getMessage("sinElementos"); + '</div>';
+  
+  var pag = $(this).html();
+  var query = browser.storage.local.get("imagenes");
+  query.then((imagenes) => {
+    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+    
+    if(imagenes.length == 0 || imagenes.length <= ((pag - 1) * elementosPorPagina)){
+      $("#galeria").html('<div class="col-12 text-center my-4">' + browser.i18n.getMessage("sinElementos") + '</div>');
     }else{
-      if (links.length >= (pag * 25)){
-        var max = pag * 25;
+      if (imagenes.length >= (pag * elementosPorPagina)){
+        var max = pag * elementosPorPagina;
       }else {
-        var max = links.length;
+        var max = imagenes.length;
       }
-      var nuevaPagina = document.createElement("div");
-      nuevaPagina.className = "cuerpo";
-      nuevaPagina.id = "galeria";
-      for (var i = ((pag - 1) * 25); i < max ; i++) {
-        var link = links[i];
-        var cuadro = document.createElement("cuadro");
-        cuadro.style.backgroundImage = "url('" + link + "')";
-        cuadro.align = "center";
+      var nuevaPagina = $(document.createElement("div"));
+      nuevaPagina.addClass("row");
+      nuevaPagina.attr("id", "galeria");
+
+      for (var i = ((pag - 1) * elementosPorPagina); i < max ; i++) {
+        var link = imagenes[i].link;
+        var cuadro = $(document.createElement("cuadro"));
+        cuadro.css({"backgroundImage": "url('" + link + "')"});
+        cuadro.addClass = "text-center";
         anadirBotones(cuadro);
-        cuadro.onmouseenter = mostrarBotones;
-        cuadro.onmouseleave = ocultarBotones;
-        nuevaPagina.appendChild(cuadro);
+        cuadro.bind("mouseenter", mostrarBotones);
+        cuadro.bind("mouseleave", ocultarBotones);
+        nuevaPagina.append(cuadro);
       }
-      document.body.replaceChild(nuevaPagina, document.getElementById("galeria"));
+
+      $("#galeria").replaceWith(nuevaPagina);
     }
   }, onError);
-  actualizarIndice(this);
+  actualizarIndice($(this));
 }
 
+//Pagina anterior
 function paginaAnterior(){
   var pagina = document.getElementsByClassName("page-item active")[0].firstChild;
   if (pagina.innerHTML != "1") {
@@ -188,6 +249,7 @@ function paginaAnterior(){
   }
 }
 
+//Pagina siguiente
 function paginaSiguiente(){
   var pagina = document.getElementsByClassName("page-item active")[0].firstChild;
   var paginas = document.getElementsByClassName("page-link");
@@ -199,3 +261,45 @@ function paginaSiguiente(){
     }
   }
 }
+
+//Cambio la forma de almacenar los datos, para mayor facilidad
+function comprobarEstructuraDatos() {
+  browser.storage.local.get("config").then((config) => {    
+    config = config.config ? config.config : new Object();
+
+    if (! config.estructuraActualizada) {
+      browser.storage.local.get(null).then((imagenes) => {
+        var links = Object.keys(imagenes);
+        var imagenesNuevas = [];
+        for (let i = 0; i < links.length; i++) {
+          const link = links[i];
+          var imagen = new Object;
+          imagen.link = link;
+          imagen.descripcion = browser.i18n.getMessage("descripcionPorDefecto");
+          imagenesNuevas.push(imagen);
+          browser.storage.local.remove(link);
+        }
+        config.estructuraActualizada = true;
+
+        browser.storage.local.set({ ["imagenes"] : imagenesNuevas });
+        browser.storage.local.set({ ["config"] : config });
+      })
+    }
+  })
+}
+
+//Levanto la aplicacion
+function initialize() {
+  comprobarEstructuraDatos();
+  document.getElementById("anterior1").onclick = cambiarPagina;
+  document.getElementById("anterior2").onclick = cambiarPagina;
+  document.getElementById("medio").onclick = cambiarPagina;
+  document.getElementById("siguiente1").onclick = cambiarPagina;
+  document.getElementById("siguiente2").onclick = cambiarPagina;
+  document.getElementById("anterior").onclick = paginaAnterior;
+  document.getElementById("siguiente").onclick = paginaSiguiente;
+
+  document.getElementById("anterior2").onclick();
+}
+
+initialize();

@@ -9,6 +9,11 @@
     "description": ""
   },
 
+  "descripcionPorDefecto": {
+    "message": "Sin descripcion",
+    "description": ""
+  },
+
   "menuDeContexto":{
     "message": "Guardar imagen en la galeria",
     "description": ""
@@ -56,6 +61,11 @@
 
   "botonEliminar":{
     "message": "Eliminar",
+    "description": ""
+  },
+
+  "botonMas": {
+    "message": "Más...",
     "description": ""
   },
 

@@ -12,10 +12,23 @@ browser.contextMenus.create({
 
 //Guarda el link del elemento en la base de datos
 function guardarLinkElemento(link){
-  var storingLink = browser.storage.local.set({ [link] : "Descripcion" });
-  //Actualizo Listado
-  var aux = document.createElement("img");
-  aux.setAttribute("src", link);
+  browser.storage.local.get("imagenes").then((imagenes) => {
+    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+
+    //Compruebo unicidad
+    if (imagenes.find(imagen => imagen.link === link)) {
+      return;
+    }
+
+    var imagen = new Object();
+    imagen.link = link;
+    imagen.descripcion = browser.i18n.getMessage("descripcionPorDefecto");
+
+    imagenes.push(imagen);
+
+    browser.storage.local.set({ ["imagenes"] : imagenes })
+
+  })
 };
 
 //Muestra que se guardo el link en la biblioteca correctamente
