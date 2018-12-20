@@ -11,7 +11,7 @@
     "96": "icons/iconoPrincipal-96.png"
   },
 
-  "permissions": ["storage", "activeTab", "contextMenus", "unlimitedStorage", "notifications"],
+  "permissions": ["storage", "activeTab", "contextMenus", "unlimitedStorage", "notifications", "downloads"],
 
   "applications": {
       "gecko": {

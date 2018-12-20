@@ -29,6 +29,26 @@
     "description": "Informa al usuario que el link se guardo correctamente en el portapapeles"
   },
 
+  "errorVerImagenTitulo": {
+    "message": "Error al intentar abrir la imagen",
+    "description": "Titulo de la notificacion."
+  },
+
+  "errorVerImagenContenido": {
+    "message": "No se pudo abrir la imagen. La url no es compatible",
+    "description": "Informa al usuario que el link se guardo correctamente en el portapapeles"
+  },
+
+  "errorDescargarImagenTitulo": {
+    "message": "Error al intentar descargar la imagen",
+    "description": "Titulo de la notificacion."
+  },
+
+  "errorDescargarImagenContenido": {
+    "message": "No se pudo descargar la imagen",
+    "description": "Informa al usuario que el link se guardo correctamente en el portapapeles"
+  },
+
   "guardadoCorrectoTitulo": {
     "message": "El link se guardo correctamente",
     "description": "Titulo de la notificacion."
@@ -69,8 +89,39 @@
     "description": ""
   },
 
+  "botonEditar": {
+    "message": "Editar",
+    "description": ""
+  },
+
+  "botonDescargar": {
+    "message": "Descargar",
+    "description": ""
+  },
+
   "sinElementos":{
     "message": "No hay elementos para mostrar",
     "description": ""
+  },
+
+  "encabezadoMenu":{
+    "message": "Acciones para esta imagen: ",
+    "description": ""
+  },
+
+  "linkCalificarExtension":{
+    "message": "Calificar extension",
+    "description": ""
+  },
+
+  "linkContactoTexto":{
+    "message": "Reportar error/Contactar ",
+    "description": ""
+  },
+
+  "linkContactoUrl":{
+    "message": "https://goo.gl/forms/c9HGxeEhDzpZJzOA2",
+    "description": ""
   }
+  
 }

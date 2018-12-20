@@ -41,6 +41,11 @@ function mostrarMensaje(link){
     "title": title,
     "message": content,
     "eventTime": 3000
+  })
+  .then((id) =>{
+    setTimeout(function(){
+      browser.notifications.clear(id);
+    }, 2500)
   });
   //browser.notifications.update(link, {"eventTime": 3000});
 }

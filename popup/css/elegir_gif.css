@@ -51,3 +51,18 @@ cuadro{
 .clear:hover {
  background-color: #EAEAC9;
 }
+
+.menuBotones {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.menuLinks {
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.imgLink{
+  width: 2em;
+  height: 2em;
+}

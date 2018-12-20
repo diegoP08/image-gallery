@@ -18,12 +18,27 @@ function copiarAlPortapapeles(){
   document.execCommand("copy");
   // Elimina el campo de la página
   document.body.removeChild(aux);
-  mostrarMensajeGuardado(link);
+  mostrarMensajeCopiado(link);
 }
 
 //Abre la imagen en nueva pestaña
 function verImagen(){
-  browser.tabs.create({ url: this.link });
+  browser.tabs.create({ url: this.link }).catch((result) => {
+    var title = browser.i18n.getMessage("errorVerImagenTitulo");
+    var content = browser.i18n.getMessage("errorVerImagenContenido");
+    browser.notifications.create(this.link,{
+      "type": "basic",
+      "iconUrl": browser.extension.getURL("icons/error.png"),
+      "title": title,
+      "message": content,
+      "eventTime": 3000
+    })
+    .then((id) =>{
+      setTimeout(function(){
+        browser.notifications.clear(id);
+      }, 3000)
+    });
+  }); 
 }
 
 //Elimina la imagen de la coleccion
@@ -43,11 +58,49 @@ function eliminarImagen(){
     });
 
   })
-
 }
 
+function descargarImagen() {
+  try{
+    browser.downloads.download({"url": this.link}).catch((result) => {
+      if (result.message != "Download canceled by the user") {
+        mostrarMensajeErrorDescargarImagen(); 
+      }
+    }); 
+  }catch (error){
+    mostrarMensajeErrorDescargarImagen();
+  }
+}
+
+function mostrarMenuBotones() {
+  $("#botonVer").prop("link", this.link);
+  $("#botonDescargar").prop("link", this.link);
+  $("#menuBotones").removeClass("d-none");
+}
+
+function ocultarMenuBotones() {
+  $("#menuBotones").addClass("d-none");
+}
+
+//Muestra un mensaje en caso de que no pueda realizarse la descarga
+function mostrarMensajeErrorDescargarImagen(params) {
+  var title = browser.i18n.getMessage("errorDescargarImagenTitulo");
+  var content = browser.i18n.getMessage("errorDescargarImagenContenido");
+  browser.notifications.create(this.link,{
+    "type": "basic",
+    "iconUrl": browser.extension.getURL("icons/error.png"),
+    "title": title,
+    "message": content,
+    "eventTime": 3000
+  })
+  .then((id) =>{
+    setTimeout(function(){
+      browser.notifications.clear(id);
+    }, 2500)
+  });
+}
 //Muestra que se guardo el link en el portapapeles correctamente
-function mostrarMensajeGuardado(link){
+function mostrarMensajeCopiado(link){
   var title = browser.i18n.getMessage("copiadoCorrectoTitulo");
   var content = browser.i18n.getMessage("copiadoCorrectoContenido");
   browser.notifications.create(link,{
@@ -55,7 +108,12 @@ function mostrarMensajeGuardado(link){
     "iconUrl": browser.extension.getURL("icons/copy.png"),
     "title": title,
     "message": content,
-    "eventTime": 3000
+    "eventTime": 1000
+  })
+  .then((id) =>{
+    setTimeout(function(){
+      browser.notifications.clear(id);
+    }, 2500)
   });
   //browser.notifications.update(link, {"eventTime": 3000});
 }
@@ -70,6 +128,11 @@ function mostrarMensajeEliminacion(link){
     "title": title,
     "message": content,
     "eventTime": 3000
+  })
+  .then((id) =>{
+    setTimeout(function(){
+      browser.notifications.clear(id);
+    }, 2500)
   });
   //browser.notifications.update(link, {"eventTime": 3000});
 }
@@ -93,13 +156,6 @@ function anadirBotones(cuadro){
   botonCopiar.bind("click", copiarAlPortapapeles);
   botonCopiar.addClass("btn btn-success btn-sm");
 
-  /*var botonVer = document.createElement("button");
-  botonVer.innerHTML = browser.i18n.getMessage("botonVer");
-  botonVer.style.marginTop = "2px";
-  botonVer.style.marginBottom = "2px";
-  botonVer.onclick = verImagen;
-  botonVer.className = "btn btn-primary btn-sm";*/
-
   var botonEliminar = $(document.createElement("button"));
   botonEliminar.html(browser.i18n.getMessage("botonEliminar"));
   botonEliminar.prop("link", link);
@@ -110,7 +166,7 @@ function anadirBotones(cuadro){
   var botonMas = $(document.createElement("button"));
   botonMas.html(browser.i18n.getMessage("botonMas"));
   botonMas.prop("link", link);
-  //botonMas.bind("click", copiarAlPortapapeles);
+  botonMas.bind("click", mostrarMenuBotones);
   botonMas.addClass("btn btn-info btn-sm");
 
   div.append(botonCopiar);
@@ -218,9 +274,10 @@ function cambiarPagina(){
       nuevaPagina.attr("id", "galeria");
 
       for (var i = ((pag - 1) * elementosPorPagina); i < max ; i++) {
-        var link = imagenes[i].link;
+        var imagen = imagenes[i];
         var cuadro = $(document.createElement("cuadro"));
-        cuadro.css({"backgroundImage": "url('" + link + "')"});
+        cuadro.css({"backgroundImage": "url('" + imagen.link + "')"});
+        cuadro.attr("title", imagen.descripcion)
         cuadro.addClass = "text-center";
         anadirBotones(cuadro);
         cuadro.bind("mouseenter", mostrarBotones);
@@ -236,10 +293,10 @@ function cambiarPagina(){
 
 //Pagina anterior
 function paginaAnterior(){
-  var pagina = document.getElementsByClassName("page-item active")[0].firstChild;
-  if (pagina.innerHTML != "1") {
-    var paginas = document.getElementsByClassName("page-link");
-    var num = parseInt(pagina.innerHTML) - 1;
+  var pagina = $( $(".page-item.active")[0].firstChild );
+  if (pagina.html() != "1") {
+    var paginas = $(".page-link");
+    var num = parseInt(pagina.html()) - 1;
     for (var i = 1; i < paginas.length - 1; i++) {
       if (parseInt(paginas[i].innerHTML) == num) {
         paginas[i].onclick();
@@ -251,9 +308,9 @@ function paginaAnterior(){
 
 //Pagina siguiente
 function paginaSiguiente(){
-  var pagina = document.getElementsByClassName("page-item active")[0].firstChild;
-  var paginas = document.getElementsByClassName("page-link");
-  var num = parseInt(pagina.innerHTML) + 1;
+  var pagina = $( $(".page-item.active")[0].firstChild );
+  var paginas = $(".page-link");
+  var num = parseInt(pagina.html()) + 1;
   for (var i = 1; i < paginas.length - 1; i++) {
     if (parseInt(paginas[i].innerHTML) == num) {
       paginas[i].onclick();
@@ -288,9 +345,29 @@ function comprobarEstructuraDatos() {
   })
 }
 
+function cargarMenus() {
+  //Menu Principal (calificar, contacto, etc...)
+  $("#linkCalificarExtension").attr("title", browser.i18n.getMessage("linkCalificarExtension"));
+  $("#linkContacto").attr("title", browser.i18n.getMessage("linkContactoTexto"));
+  $("#linkContacto").parent().attr("href", browser.i18n.getMessage("linkContactoUrl"));
+  $("#botonOcultarMenuBotones").bind("click", ocultarMenuBotones);
+
+  //Menu de botones
+  $("#encabezadoMenuBotones").html(browser.i18n.getMessage("encabezadoMenu"));
+
+  $("#botonVer").html(browser.i18n.getMessage("botonVer"));
+  $("#botonVer").bind("click",verImagen);
+
+  $("#botonEditar").html(browser.i18n.getMessage("botonEditar"));
+
+  $("#botonDescargar").html(browser.i18n.getMessage("botonDescargar"));
+  $("#botonDescargar").bind("click",descargarImagen);
+}
+
 //Levanto la aplicacion
 function initialize() {
   comprobarEstructuraDatos();
+  cargarMenus();
   document.getElementById("anterior1").onclick = cambiarPagina;
   document.getElementById("anterior2").onclick = cambiarPagina;
   document.getElementById("medio").onclick = cambiarPagina;
