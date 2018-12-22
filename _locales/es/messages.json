@@ -10,7 +10,7 @@
   },
 
   "descripcionPorDefecto": {
-    "message": "Sin descripcion",
+    "message": "Sin descripción",
     "description": ""
   },
 
@@ -121,6 +121,26 @@
 
   "linkContactoUrl":{
     "message": "https://goo.gl/forms/c9HGxeEhDzpZJzOA2",
+    "description": ""
+  },
+
+  "labelDescripcion":{
+    "message": "Descripción:",
+    "description": ""
+  },
+
+  "botonGuardarEdicion":{
+    "message": "Guardar cambios",
+    "description": ""
+  },
+
+  "botonCancelarEdicion":{
+    "message": "Cancelar",
+    "description": ""
+  },
+
+  "placeholderBuscador":{
+    "message": "Buscar por descripción...",
     "description": ""
   }
   

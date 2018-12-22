@@ -122,5 +122,25 @@
   "linkContactoUrl":{
     "message": "https://goo.gl/forms/6FR9LljCPyuPPjAL2",
     "description": ""
+  },
+
+  "labelDescripcion":{
+    "message": "Description:",
+    "description": ""
+  },
+
+  "botonGuardarEdicion":{
+    "message": "Save changes",
+    "description": ""
+  },
+
+  "botonCancelarEdicion":{
+    "message": "Cancel",
+    "description": ""
+  },
+
+  "placeholderBuscador":{
+    "message": "Search by description...",
+    "description": ""
   }
 }

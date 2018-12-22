@@ -9,59 +9,24 @@
 
   <body style="width: 500px">
     <div id="menus" class="container mt-2">
-      <div class="row justify-content-end menuLinks" id="menuLinks">
+      <div class="row justify-content-end menuLinks mx-1" id="menuLinks">
         <a href="">
           <img id="linkContacto" src="/icons/contact.png" class="imgLink">
         </a>
-
+    
         <a href="https://addons.mozilla.org/firefox/addon/image-gallery/">
           <img id="linkCalificarExtension" src="/icons/star_rate.png" class="imgLink">
         </a>
       </div>
-      <div id="menuBotones" class="d-none">
-        <div class="row menuBotones">
-          <div id="encabezadoMenuBotones">
+    </div>
+    <div id="app">
 
-          </div>
-          <button type="button" class="close ml-auto" id="botonOcultarMenuBotones">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="row menuBotones justify-content-center" id="listaBotones">
-          <button class="btn btn-outline-primary btn-sm" id="botonVer"></button>
-          <button class="btn btn-outline-info btn-sm ml-1" id="botonEditar"></button>
-          <button class="btn btn-outline-success btn-sm ml-1" id="botonDescargar"></button>
-        </div>
-      </div>
     </div>
-    <div class="container my-2" style="width: 500px; margin-left: 0px;">
-      <div class="row" id="galeria"></div>
-    </div>
-    <nav aria-label="Page navigation example" class="row justify-content-center">
-      <ul class="pagination mb-2">
-        <li class="page-item">
-          <button class="page-link" href="#" aria-label="Previous" id="anterior">
-            <span aria-hidden="true">&laquo;</span>
-            <span class="sr-only">Previous</span>
-          </button>
-        </li>
-        <li class="page-item"><button class="page-link" id="anterior2">1</button></li>
-        <li class="page-item"><button class="page-link" id="anterior1">2</button></li>
-        <li class="page-item"><button class="page-link" id="medio" >3</button></li>
-        <li class="page-item"><button class="page-link" id="siguiente1">4</button></li>
-        <li class="page-item"><button class="page-link" id="siguiente2">5</button></li>
-        <li class="page-item">
-          <button class="page-link" href="#" aria-label="Next" id="siguiente">
-            <span aria-hidden="true">&raquo;</span>
-            <span class="sr-only">Next</span>
-          </button>
-        </li>
-      </ul>
-    </nav>
   </body>
   <script src="js/jquery.min.js"></script>
   <script src="js/popper.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
-  <script src="js/elegir_gif.js"></script>
-  <!-- Incluir jquery y popper de ser necesario -->
+  <script src="js/_listadoImagenes.js"></script>
+  <script src="js/_formularioEditarImagen.js"></script>
+  <script src="js/_elegir_gif.js"></script>
 </html>

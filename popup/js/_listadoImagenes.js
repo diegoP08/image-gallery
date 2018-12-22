@@ -21,6 +21,28 @@ function copiarAlPortapapeles(){
   mostrarMensajeCopiado(link);
 }
 
+//Elimina la imagen de la coleccion
+function eliminarImagen(){
+  var link = this.link;
+
+  browser.storage.local.get("imagenes").then((imagenes) => {
+    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+
+    imagenes = imagenes.filter(imagen => imagen.link != link);
+
+    browser.storage.local.set({ ["imagenes"] : imagenes }).then((result) =>{
+      $(".page-item.active")[0].firstChild.onclick();
+      mostrarMensajeEliminacion();
+    });
+
+  })
+}
+
+//Oculta las acciones adicionales (ver, editar, etc)
+function ocultarMenuBotones() {
+  $("#menuBotones").addClass("d-none");
+}
+
 //Abre la imagen en nueva pestaña
 function verImagen(){
   browser.tabs.create({ url: this.link }).catch((result) => {
@@ -41,25 +63,7 @@ function verImagen(){
   }); 
 }
 
-//Elimina la imagen de la coleccion
-function eliminarImagen(){
-  var link = this.link;
-
-  browser.storage.local.get("imagenes").then((imagenes) => {
-    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
-
-    var imagenes = $.grep(imagenes, function(imagen){ 
-      return imagen.link != link; 
-    });
-
-    browser.storage.local.set({ ["imagenes"] : imagenes }).then((result) =>{
-      $(".page-item.active")[0].firstChild.onclick();
-      mostrarMensajeEliminacion();
-    });
-
-  })
-}
-
+//Descarga imagen
 function descargarImagen() {
   try{
     browser.downloads.download({"url": this.link}).catch((result) => {
@@ -72,14 +76,21 @@ function descargarImagen() {
   }
 }
 
+//Carga el formulario para editar una imagen
+function cargarPagEditarImagen() {
+  var link = this.link;
+  $("#app").load("formularioEditarImagen.html", function(responseTxt, statusTxt, xhr){ 
+    $("#botonGuardarEdicion").prop("link", link);
+    FormularioEditarImagen.initialize()
+  }); 
+}
+
+//Muestra las acciones adicionales (ver, editar, etc)
 function mostrarMenuBotones() {
   $("#botonVer").prop("link", this.link);
   $("#botonDescargar").prop("link", this.link);
+  $("#botonEditar").prop("link", this.link);
   $("#menuBotones").removeClass("d-none");
-}
-
-function ocultarMenuBotones() {
-  $("#menuBotones").addClass("d-none");
 }
 
 //Muestra un mensaje en caso de que no pueda realizarse la descarga
@@ -99,6 +110,7 @@ function mostrarMensajeErrorDescargarImagen(params) {
     }, 2500)
   });
 }
+
 //Muestra que se guardo el link en el portapapeles correctamente
 function mostrarMensajeCopiado(link){
   var title = browser.i18n.getMessage("copiadoCorrectoTitulo");
@@ -214,7 +226,11 @@ function actualizarIndice(pag){
   }
 
   browser.storage.local.get("imagenes").then((imagenes) => {
-    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+    var textoBuscado = $("#buscador").val();
+    
+    imagenes = imagenes.imagenes 
+      ? imagenes.imagenes.filter(img => img.descripcion.toLowerCase().includes(textoBuscado.toLowerCase()))
+      : [];
     var cantPags = Math.ceil(imagenes.length / elementosPorPagina);
 
     for (var i = 1; i < paginas.length - 1; i++) {
@@ -252,14 +268,17 @@ function actualizarIndice(pag){
   
 }
 
-
 //Cambia de pagina
 function cambiarPagina(){
   
   var pag = $(this).html();
   var query = browser.storage.local.get("imagenes");
   query.then((imagenes) => {
-    imagenes = imagenes.imagenes ? imagenes.imagenes : [];
+    var textoBuscado = $("#buscador").val();
+
+    imagenes = imagenes.imagenes 
+      ? imagenes.imagenes.filter(img => img.descripcion.toLowerCase().includes(textoBuscado.toLowerCase())) 
+      : [];
     
     if(imagenes.length == 0 || imagenes.length <= ((pag - 1) * elementosPorPagina)){
       $("#galeria").html('<div class="col-12 text-center my-4">' + browser.i18n.getMessage("sinElementos") + '</div>');
@@ -299,7 +318,7 @@ function paginaAnterior(){
     var num = parseInt(pagina.html()) - 1;
     for (var i = 1; i < paginas.length - 1; i++) {
       if (parseInt(paginas[i].innerHTML) == num) {
-        paginas[i].onclick();
+        paginas[i].click();
         break;
       }
     }
@@ -313,10 +332,21 @@ function paginaSiguiente(){
   var num = parseInt(pagina.html()) + 1;
   for (var i = 1; i < paginas.length - 1; i++) {
     if (parseInt(paginas[i].innerHTML) == num) {
-      paginas[i].onclick();
+      paginas[i].click();
       break;
     }
   }
+}
+
+//Reinicia los numeros de las paginas y dispara la busqueda por los valores ingresados
+function busqueda(){
+  $("#anterior2").html("1");
+  $("#anterior1").html("2");
+  $("#medio").html("3");
+  $("#siguiente1").html("4");
+  $("#siguiente2").html("5");
+
+  $("#anterior2").click();
 }
 
 //Cambio la forma de almacenar los datos, para mayor facilidad
@@ -339,44 +369,48 @@ function comprobarEstructuraDatos() {
         config.estructuraActualizada = true;
 
         browser.storage.local.set({ ["imagenes"] : imagenesNuevas });
-        browser.storage.local.set({ ["config"] : config });
+        browser.storage.local.set({ ["config"] : config }).then((resultado) => { cargarPaginado() });
       })
     }
   })
 }
 
-function cargarMenus() {
-  //Menu Principal (calificar, contacto, etc...)
-  $("#linkCalificarExtension").attr("title", browser.i18n.getMessage("linkCalificarExtension"));
-  $("#linkContacto").attr("title", browser.i18n.getMessage("linkContactoTexto"));
-  $("#linkContacto").parent().attr("href", browser.i18n.getMessage("linkContactoUrl"));
+//Menu de botones (accion mas...)
+function cargarMenuBotones() {
   $("#botonOcultarMenuBotones").bind("click", ocultarMenuBotones);
-
-  //Menu de botones
   $("#encabezadoMenuBotones").html(browser.i18n.getMessage("encabezadoMenu"));
 
   $("#botonVer").html(browser.i18n.getMessage("botonVer"));
-  $("#botonVer").bind("click",verImagen);
+  $("#botonVer").bind("click", verImagen);
 
   $("#botonEditar").html(browser.i18n.getMessage("botonEditar"));
+  $("#botonEditar").bind("click", cargarPagEditarImagen);
 
   $("#botonDescargar").html(browser.i18n.getMessage("botonDescargar"));
-  $("#botonDescargar").bind("click",descargarImagen);
+  $("#botonDescargar").bind("click", descargarImagen);
+}
+
+//Asigna funciones al indice y carga la primer pag
+function cargarPaginado() {
+  $("#buscador").bind("keyup", busqueda)
+  $("#buscador").attr("placeholder", browser.i18n.getMessage("placeholderBuscador"))
+
+  $("#anterior2").bind("click", cambiarPagina);
+  $("#anterior1").bind("click", cambiarPagina);
+  $("#medio").bind("click", cambiarPagina);
+  $("#siguiente1").bind("click", cambiarPagina);
+  $("#siguiente2").bind("click", cambiarPagina);
+  $("#anterior").bind("click", paginaAnterior);
+  $("#siguiente").bind("click", paginaSiguiente);
+
+  $("#anterior2").click();
 }
 
 //Levanto la aplicacion
 function initialize() {
   comprobarEstructuraDatos();
-  cargarMenus();
-  document.getElementById("anterior1").onclick = cambiarPagina;
-  document.getElementById("anterior2").onclick = cambiarPagina;
-  document.getElementById("medio").onclick = cambiarPagina;
-  document.getElementById("siguiente1").onclick = cambiarPagina;
-  document.getElementById("siguiente2").onclick = cambiarPagina;
-  document.getElementById("anterior").onclick = paginaAnterior;
-  document.getElementById("siguiente").onclick = paginaSiguiente;
-
-  document.getElementById("anterior2").onclick();
+  cargarMenuBotones();
+  cargarPaginado();
 }
 
-initialize();
+var Listado = { "initialize": initialize }
