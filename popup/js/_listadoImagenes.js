@@ -31,7 +31,8 @@ function eliminarImagen(){
     imagenes = imagenes.filter(imagen => imagen.link != link);
 
     browser.storage.local.set({ ["imagenes"] : imagenes }).then((result) =>{
-      $(".page-item.active")[0].firstChild.onclick();
+      $(".page-item.active")[0].firstChild.click();
+      
       mostrarMensajeEliminacion();
     });
 
@@ -349,32 +350,6 @@ function busqueda(){
   $("#anterior2").click();
 }
 
-//Cambio la forma de almacenar los datos, para mayor facilidad
-function comprobarEstructuraDatos() {
-  browser.storage.local.get("config").then((config) => {    
-    config = config.config ? config.config : new Object();
-
-    if (! config.estructuraActualizada) {
-      browser.storage.local.get(null).then((imagenes) => {
-        var links = Object.keys(imagenes);
-        var imagenesNuevas = [];
-        for (let i = 0; i < links.length; i++) {
-          const link = links[i];
-          var imagen = new Object;
-          imagen.link = link;
-          imagen.descripcion = browser.i18n.getMessage("descripcionPorDefecto");
-          imagenesNuevas.push(imagen);
-          browser.storage.local.remove(link);
-        }
-        config.estructuraActualizada = true;
-
-        browser.storage.local.set({ ["imagenes"] : imagenesNuevas });
-        browser.storage.local.set({ ["config"] : config }).then((resultado) => { cargarPaginado() });
-      })
-    }
-  })
-}
-
 //Menu de botones (accion mas...)
 function cargarMenuBotones() {
   $("#botonOcultarMenuBotones").bind("click", ocultarMenuBotones);
@@ -408,7 +383,6 @@ function cargarPaginado() {
 
 //Levanto la aplicacion
 function initialize() {
-  comprobarEstructuraDatos();
   cargarMenuBotones();
   cargarPaginado();
 }
