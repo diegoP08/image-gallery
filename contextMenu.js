@@ -1,4 +1,4 @@
-//Error para la funcion "Promise"
+//Error para la funcion "Promise" 
 function onError(e){
   console.error(e);
 }
